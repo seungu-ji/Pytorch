@@ -223,3 +223,35 @@ plt.imshow(dst, cmap="gray")
 plt.title("Noisy data")
 
 plt.show()
+
+## Super-resolution
+
+"""
+order options
+0: Nearest-neighbor
+1: Bi-linear (default)
+2: Bi-quadratic
+3: Bi-cubic
+4: Bi-quartic
+5: Bi-quintic
+"""
+
+dw = 1/5.0
+order = 0
+
+dst_dw = rescale(img, scale=(dw, dw, 1), order=order)
+dst_up = rescale(dst_dw, scale=(1/dw, 1/dw, 1), order=order)
+
+plt.subplot(131)
+plt.imshow(np.squeeze(img), cmap=cmap, vmin=0, vmax=1)
+plt.title("Ground Truth")
+
+plt.subplot(132)
+plt.imshow(np.squeeze(dst_dw), cmap=cmap, vmin=0, vmax=1)
+plt.title("Downscaled image")
+
+plt.subplot(133)
+plt.imshow(np.squeeze(dst_up), cmap=cmap, vmin=0, vmax=1)
+plt.title("Upscaled image")
+
+plt.show()
