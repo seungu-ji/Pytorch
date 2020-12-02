@@ -16,6 +16,9 @@ plt.imshow(np.squeeze(img), cmap=cmap, vmin=0, vmax=1)
 plt.title("Ground Truth")
 plt.show()
 
+
+## Inpainting
+
 ## Inpainting: Uniform sampling
 ds_y = 2
 ds_x = 4
@@ -82,12 +85,17 @@ a = 1
 gaus = a * np.exp(-((x - x0)**2/(2*sgmx**2) + (y - y0)**2/(2*sgmy**2)))
 #plt.imshow(gaus)
 gaus = np.tile(gaus[:, :, np.newaxis], (1, 1, size[2]))
+# RGB 방향으로 동일한 sampling을 하고 싶을시
+# gaus = np.tile(gaus[:, :, np.newaxis], (1, 1, 1))
 
 rnd = np.random.rand(size[0], size[1], size[2])
+# rnd = np.random(size[0], size[1], 1)
 
 mask = (rnd < gaus).astype(np.float)
+# + mask = np.tile(mask, (1, 1, size[2]))
 
 dst = img * mask
+
 
 plt.subplot(131)
 plt.imshow(np.squeeze(img), cmap=cmap, vmin=0, vmax=1)
