@@ -24,13 +24,23 @@ parser.add_argument("--lr", default=1e-3, type=float, dest="lr")
 parser.add_argument("--batch_size", default=4, type=int, dest="batch_size")
 parser.add_argument("--num_epoch", default=100, type=int, dest="num_epoch")
 
-parser.add_argument("--data_dir", default="./datasets", type=str, dest="data_dir")
+parser.add_argument("--data_dir", default="./datasets/BSR/BSDS500/data/images", type=str, dest="data_dir")
 parser.add_argument("--ckpt_dir", default="./checkpoint", type=str, dest="ckpt_dir")
 parser.add_argument("--log_dir", default="./log", type=str, dest="log_dir")
 parser.add_argument("--result_dir", default="./result", type=str, dest="result_dir")
 
 parser.add_argument("--mode", default="train", type=str, dest="mode")
 parser.add_argument("--train_continue", default="off", type=str, dest="train_continue")
+
+parser.add_argument("--task", default="denoising", choices=["denoising", "inpainting", "super_resolution"], type=str, dest="task")
+parser.add_argument("--opts", nargs='+', default=["random", 30.0], dest="opts")
+
+parser.add_argument("--ny", default=320, type=int, dest="ny")
+parser.add_argument("--nx", default=480, type=int, dest="nx")
+parser.add_argument("--nch", default=3, type=int, dest="nch")
+parser.add_argument("--nker", default=64, type=int, dest="nker")
+
+parser.add_argument("--network", default="unet", choices=["unet", "resnet", "autoencoder"], type=str, desk="network")
 
 args = parser.parse_args()
 
@@ -47,6 +57,16 @@ result_dir = args.result_dir
 mode = args.mode
 train_continue = args.train_continue
 
+task = args.task
+opts = [args.opt[0], np.asarray(args.opts[1:]).astype(np.float)]
+
+ny = args.ny
+nx = args.nx
+nch = args.nch
+nker = args.nker
+
+network = args.network
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 print("learning rate: %.4e" % lr)
@@ -58,19 +78,28 @@ print("log dir: %s" % log_dir)
 print("result dir: %s" % result_dir)
 print("mode: %s" % mode)
 
+
 ## directory setting
+result_dir_train = os.path.join(result_dir, 'train')
+result_dir_val = os.path.join(result_dir, 'val')
+result_dir_test = os.path.join(result_dir, 'test')
+
 if not os.path.exists(result_dir):
-    os.makedirs(os.path.join(result_dir, 'png'))
-    os.makedirs(os.path.join(result_dir, 'numpy'))
+    os.makedirs(os.path.join(result_dir_train, 'png'))
+    os.makedirs(os.path.join(result_dir_val, 'png'))
+
+    os.makedirs(os.path.join(result_dir_test, 'png'))
+    os.makedirs(os.path.join(result_dir_test, 'numpy'))
 
 ## network training
 if mode == 'train':
-    transform = transforms.Compose([Normalization(mean=0.5, std=0.5), RandomFlip(), ToTensor()])
+    transform_train = transforms.Compose([Normalization(mean=0.5, std=0.5), RandomFlip(), ToTensor()])
+    transform_val = transforms.Compose([Normalization(mean=0.5, std=0.5), ToTensor()])
 
-    dataset_train = Dataset(data_dir=os.path.join(data_dir, 'train'), transform=transform)
+    dataset_train = Dataset(data_dir=os.path.join(data_dir, 'train'), transform=transform_train)
     loader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=8)
 
-    dataset_val = Dataset(data_dir=os.path.join(data_dir, 'val'), transform=transform)
+    dataset_val = Dataset(data_dir=os.path.join(data_dir, 'val'), transform=transform_val)
     loader_val = DataLoader(dataset_val, batch_size=batch_size, shuffle=False, num_workers=8)
 
     # variables setting
