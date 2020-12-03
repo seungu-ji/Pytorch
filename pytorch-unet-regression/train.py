@@ -96,10 +96,10 @@ if mode == 'train':
     transform_train = transforms.Compose[(RandomCrop(shape=(ny, nx)), Normalization(mean=0.5, std=0.5), RandomFlip(), ToTensor()])
     transform_val = transforms.Compose([RandomCrop(shape=ny, nx)), Normalization(mean=0.5, std=0.5), ToTensor()])
 
-    dataset_train = Dataset(data_dir=os.path.join(data_dir, 'train'), transform=transform_train)
+    dataset_train = Dataset(data_dir=os.path.join(data_dir, 'train'), transform=transform_train, task=task, opts=opts)
     loader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=8)
 
-    dataset_val = Dataset(data_dir=os.path.join(data_dir, 'val'), transform=transform_val)
+    dataset_val = Dataset(data_dir=os.path.join(data_dir, 'val'), transform=transform_val, task=task, opts=opts)
     loader_val = DataLoader(dataset_val, batch_size=batch_size, shuffle=False, num_workers=8)
 
     # variables setting
@@ -111,7 +111,7 @@ if mode == 'train':
 else:
     transform_test = transforms.Compose([RandomCrop(shape=(ny, nx)), Normalization(mean=0.5, std=0.5), ToTensor()])
 
-    dataset_test = Dataset(data_dir=os.path.join(data_dir, 'test'), transform=transform_test)
+    dataset_test = Dataset(data_dir=os.path.join(data_dir, 'test'), transform=transform_test, task=task, opts=opts)
     loader_test = DataLoader(dataset_test, batch_size=batch_size, shuffle=False, num_workers=8)
 
     # variables setting
