@@ -1,5 +1,7 @@
 import os
 import numpy as np
+from scipy.stats import poisson
+from skimage.transform import rescale, resize
 
 import torch
 import torch.nn as nn
@@ -70,17 +72,45 @@ def add_sampling(img, type="random", opts=None):
 
 ## Add Noise
 def add_noise(img, type="random", opts=None):
-    sz = img.shape
+    size = img.shape
 
     if type == "random":
         sgm = opts[0]
 
-        noise = sgm / 255.0 * np.random.randn(sz[0], sz[1], sz[2])
+        noise = sgm / 255.0 * np.random.randn(size[0], size[1], size[2])
 
         dst = img + noise
 
     elif type == "poisson":
         dst = poisson.rvs(255.0 * img) / 255.0
         noise = dst - img
+
+    return dst
+
+## Add blurring
+def add_blur(img, type="bilinear", opts=None):
+    if type == "nearest":
+        order = 0
+    elif type == "bilinear":
+        order = 1
+    elif type == "biquadratic":
+        order = 2
+    elif type == "bicubic":
+        order = 3
+    elif type == "biquartic":
+        order = 4
+    elif type == "biquintic":
+        order = 5
+
+    size = img.shape
+    if len(opts) == 1:
+        keepdim = True
+    else:
+        keepdim = opts[1]
+
+    dst = resize(img, output_shape=(size[0] // opts[0], size[1] // opts[0], size[2]), order=order)
+
+    if keepdim:
+        dst = resize(dst, output_shape=(size[0], size[1], size[2]), order=order)
 
     return dst
