@@ -93,8 +93,8 @@ if not os.path.exists(result_dir):
 
 ## network training
 if mode == 'train':
-    transform_train = transforms.Compose([Normalization(mean=0.5, std=0.5), RandomFlip(), ToTensor()])
-    transform_val = transforms.Compose([Normalization(mean=0.5, std=0.5), ToTensor()])
+    transform_train = transforms.Compose[(RandomCrop(shape=(ny, nx)), Normalization(mean=0.5, std=0.5), RandomFlip(), ToTensor()])
+    transform_val = transforms.Compose([RandomCrop(shape=ny, nx)), Normalization(mean=0.5, std=0.5), ToTensor()])
 
     dataset_train = Dataset(data_dir=os.path.join(data_dir, 'train'), transform=transform_train)
     loader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=8)
@@ -109,9 +109,9 @@ if mode == 'train':
     num_batch_train = np.ceil(num_data_train / batch_size)
     num_batch_val = np.ceil(num_data_val / batch_size)
 else:
-    transform = transforms.Compose([Normalization(mean=0.5, std=0.5), ToTensor()])
+    transform_test = transforms.Compose([RandomCrop(shape=(ny, nx)), Normalization(mean=0.5, std=0.5), ToTensor()])
 
-    dataset_test = Dataset(data_dir=os.path.join(data_dir, 'test'), transform=transform)
+    dataset_test = Dataset(data_dir=os.path.join(data_dir, 'test'), transform=transform_test)
     loader_test = DataLoader(dataset_test, batch_size=batch_size, shuffle=False, num_workers=8)
 
     # variables setting
