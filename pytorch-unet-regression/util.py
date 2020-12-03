@@ -67,3 +67,20 @@ def add_sampling(img, type="random", opts=None):
         dst = img * mask
 
     return dst
+
+## Add Noise
+def add_noise(img, type="random", opts=None):
+    sz = img.shape
+
+    if type == "random":
+        sgm = opts[0]
+
+        noise = sgm / 255.0 * np.random.randn(sz[0], sz[1], sz[2])
+
+        dst = img + noise
+
+    elif type == "poisson":
+        dst = poisson.rvs(255.0 * img) / 255.0
+        noise = dst - img
+
+    return dst
