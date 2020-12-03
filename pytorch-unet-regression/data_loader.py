@@ -1,40 +1,55 @@
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 import torch
 import torch.nn as nn
 
+from util import *
+
 ## Data Loader
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, data_dir, transform=None):
+    def __init__(self, data_dir, transform=None, task=None, opts=None):
         self.data_dir = data_dir
         self.transform = transform
+        self.task = task
+        self.opts = opts
 
         lst_data = os.listdir(self.data_dir)
 
-        lst_label = [f for f in lst_data if f.startswith('label')]
-        lst_input = [f for f in lst_data if f.startswith('input')]
+        lst_data = [f for f in lst_data if f.endswith('jpg') | f.endswith('png')]
 
-        lst_label.sort()
-        lst_input.sort()
+        lst_data.sort()
 
-        self.lst_label = lst_label
-        self.lst_input = lst_input
+        self.lst_data = lst_data
 
     def __len__(self):
-        return len(self.lst_label)
+        return len(self.lst_data)
 
     def __getitem__(self, index):
-        label = np.load(os.path.join(self.data_dir, self.lst_label[index]))
-        input = np.load(os.path.join(self.data_dir, self.lst_input[index]))
+        # label = np.load(os.path.join(self.data_dir, self.lst_label[index]))
+        # input = np.load(os.path.join(self.data_dir, self.lst_input[index]))
+        img = plt.imread(os.path.join(self.data_dir, self.lst_data[index]))
+        size = img.shape
 
-        label = label/255.0
-        input = input/255.0
+        if size[0] > size[1]: # 항상 가로로 긴 이미지로 저장
+            img = img.transpose((1, 0, 2))
 
-        if label.ndim == 2:
+        if img.dtype == np.unit8:
+            img = img/255.0
+
+        if img.ndim == 2:
             label = label[:, :, np.newaxis]
-        if input.ndim == 2:
-            input = input[:, :, np.newaxis]
+
+        label = img
+
+        if self.task == "denoising":
+            input = add_noise(img, type=self.opts[0], opts=self.opts[1])
+        elif self.task == "inpainting":
+            input = add_sampling(img, type=self.opts[0], opts=self.opts[1])
+        elif self.task == "super_resolution":
+            input = add_blur(img, type=self.opts[0], opts=self.opts[1])
+
 
         data = {'input': input, 'label': label}
 
