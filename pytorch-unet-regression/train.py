@@ -120,7 +120,10 @@ else:
     num_batch_test = np.ceil(num_data_test / batch_size)
 
 ## network load
-net = UNet().to(device)
+if network == "unet":
+    net = UNet().to(device)
+#elif network == "resnet":
+#   net = ResNet().to(device)
 
 ## loss function
 fn_loss = nn.BCEWithLogitsLoss().to(device)
