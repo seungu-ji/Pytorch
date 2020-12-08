@@ -121,12 +121,14 @@ else:
 
 ## network load
 if network == "unet":
-    net = UNet().to(device)
+    net = UNet(nch=nch, nker=nker, norm="bnorm").to(device)
 #elif network == "resnet":
 #   net = ResNet().to(device)
 
 ## loss function
-fn_loss = nn.BCEWithLogitsLoss().to(device)
+# fn_loss = nn.BCEWithLogitsLoss().to(device) # for segmentation
+# L2 loss = nn.MSEloss(), L1 loss = nn.L1loss # for regression
+fn_loss = nn.MSELoss().to(device)
 
 ## Optimizer
 optim = torch.optim.Adam(net.parameters(), lr=lr)
@@ -134,7 +136,7 @@ optim = torch.optim.Adam(net.parameters(), lr=lr)
 ## variables setting
 fn_tonumpy = lambda x: x.to('cpu').detach().numpy().transpose(0, 2, 3, 1)
 fn_denorm = lambda x, mean, std: (x * std) + mean
-fn_class = lambda x: 1.0 * (x > 0.5)
+# fn_class = lambda x: 1.0 * (x > 0.5) # regression에선 사용 X
 
 ## SummaryWriter for Tensorboard
 writer_train = SummaryWriter(log_dir=os.path.join(log_dir, 'train'))
