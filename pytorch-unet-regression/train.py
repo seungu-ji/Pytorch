@@ -41,6 +41,7 @@ parser.add_argument("--nch", default=3, type=int, dest="nch")
 parser.add_argument("--nker", default=64, type=int, dest="nker")
 
 parser.add_argument("--network", default="unet", choices=["unet", "resnet", "autoencoder"], type=str, desk="network")
+parser.add_argument("--learning_type", default="plain", choices=["plain", "residual"], type=str, dest="learning_type")
 
 args = parser.parse_args()
 
@@ -66,6 +67,7 @@ nch = args.nch
 nker = args.nker
 
 network = args.network
+learning_type = args.learning_type
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -121,7 +123,7 @@ else:
 
 ## network load
 if network == "unet":
-    net = UNet(nch=nch, nker=nker, norm="bnorm").to(device)
+    net = UNet(nch=nch, nker=nker, norm="bnorm", learning_type="plain").to(device)
 #elif network == "resnet":
 #   net = ResNet().to(device)
 

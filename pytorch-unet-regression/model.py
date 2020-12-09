@@ -8,9 +8,9 @@ from layer import *
 
 ## UNet
 class UNet(nn.Module):
-    def __init__(self, nch, nker, norm="bnorm"):
+    def __init__(self, nch, nker, norm="bnorm", learning_type="plain"):
         super(UNet, self).__init__()
-
+        self.learning_type = learning_type
 
         # Contracting path (encoder)
         self.enc1_1 = CBR2d(in_channels=nch, out_channels=1 * nker, norm=norm) # , kernel_size=3, stride=1, padding=1, bias=True
@@ -109,6 +109,9 @@ class UNet(nn.Module):
         dec1_2 = self.dec1_2(cat1)
         dec1_1 = self.dec1_1(dec1_2)
 
-        x = self.fc(dec1_1)
+        if self.learning_type == "plain":
+            x = self.fc(dec1_1)
+        elif self.learning_type == "residual":
+            x = x + self.fc(dec1_1) # **residual learning**
 
         return x
