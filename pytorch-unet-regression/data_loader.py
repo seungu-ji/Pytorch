@@ -122,7 +122,7 @@ class RandomCrop(object):
         id_y = np.arange(top, top + new_h, 1)[:, np.newaxis]
         id_x = np.arange(left, left + new_w, 1)
 
-        input = input[id+_y, id_x]
+        input = input[id_y, id_x]
         label = label[id_y, id_x]
 
         data = {'input': input, 'label': label}
