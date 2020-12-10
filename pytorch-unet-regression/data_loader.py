@@ -35,7 +35,7 @@ class Dataset(torch.utils.data.Dataset):
         if size[0] > size[1]: # 항상 가로로 긴 이미지로 저장
             img = img.transpose((1, 0, 2))
 
-        if img.dtype == np.unit8:
+        if img.dtype == np.uint8:
             img = img/255.0
 
         if img.ndim == 2:
