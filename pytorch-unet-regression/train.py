@@ -95,8 +95,8 @@ if not os.path.exists(result_dir):
 
 ## network training
 if mode == 'train':
-    transform_train = transforms.Compose[(RandomCrop(shape=(ny, nx)), Normalization(mean=0.5, std=0.5), RandomFlip(), ToTensor()])
-    transform_val = transforms.Compose([RandomCrop(shape=ny, nx)), Normalization(mean=0.5, std=0.5), ToTensor()])
+    transform_train = transforms.Compose([RandomCrop(shape=(ny, nx)), Normalization(mean=0.5, std=0.5), RandomFlip()])
+    transform_val = transforms.Compose([RandomCrop(shape=(ny, nx)), Normalization(mean=0.5, std=0.5)])
 
     dataset_train = Dataset(data_dir=os.path.join(data_dir, 'train'), transform=transform_train, task=task, opts=opts)
     loader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=8)
