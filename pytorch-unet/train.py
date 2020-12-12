@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from model import UNet
-from data_loader import *
+from dataset import *
 from util import *
 
 import matplotlib.pyplot as plt
