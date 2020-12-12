@@ -13,8 +13,7 @@ class UNet(nn.Module):
         def CBR2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True):
             layers = []
             layers += [nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
-                                 kernel_size=kernel_size, stride=stride, padding=padding,
-                                 bias=bias)]
+                                 kernel_size=kernel_size, stride=stride, padding=padding, bias=bias)]
             layers += [nn.BatchNorm2d(num_features=out_channels)]
             layers += [nn.ReLU()]
 
